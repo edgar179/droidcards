@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cartas de Droids</title>
+    <title>Cartas de Droids (Versão Corrigida)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -339,7 +339,7 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, addDoc, updateDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Global variables provided by the environment for Firebase configuration and authentication
+        // Variáveis globais fornecidas pelo ambiente para configuração do Firebase e autenticação
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
@@ -363,7 +363,7 @@
 
         let newImageFile = null;
 
-        // Listener for authentication state changes
+        // Listener para mudanças no estado de autenticação
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 userId = user.uid;
@@ -371,12 +371,12 @@
                 await setupFirestoreListener();
                 addCardBtn.disabled = false;
             } else {
-                // Tries to sign in with the provided token, otherwise signs in anonymously
+                // Tenta fazer login com o token fornecido, caso contrário, faz login anonimamente
                 if (initialAuthToken) {
                     try {
                         await signInWithCustomToken(auth, initialAuthToken);
                     } catch (e) {
-                        console.error("Custom token sign in failed. Signing in anonymously.", e);
+                        console.error("Falha no login com token. Tentando login anônimo.", e);
                         await signInAnonymously(auth);
                     }
                 } else {
@@ -385,9 +385,9 @@
             }
         });
 
-        // Sets up a real-time listener for the Firestore collection
+        // Configura um ouvinte em tempo real para a coleção do Firestore
         async function setupFirestoreListener() {
-            // Correct path for collaborative public data
+            // Caminho correto para dados públicos colaborativos
             const droidsRef = collection(db, `artifacts/${appId}/public/data/${droidCollectionName}`);
             onSnapshot(droidsRef, (snapshot) => {
                 const droidsData = [];
@@ -398,7 +398,7 @@
             });
         }
 
-        // Renders the droid cards on the page
+        // Renderiza os cartões de droid na página
         function renderCards(droidsData) {
             container.innerHTML = '';
             if (droidsData.length === 0) {
@@ -407,7 +407,7 @@
             droidsData.forEach((droid) => {
                 const card = document.createElement('div');
                 card.className = 'droid-card';
-                // Use a placeholder icon if there's no image
+                // Usa um ícone de placeholder se não houver imagem
                 const iconContent = droid.image ? `<img src="${droid.image}" alt="Imagem do Droid">` : `<i class="fas fa-robot"></i>`;
 
                 card.innerHTML = `
@@ -437,7 +437,7 @@
             });
         }
 
-        // Handles click events on the cards for editing and deleting
+        // Lida com eventos de clique nos cartões para edição e exclusão
         container.addEventListener('click', async (event) => {
             const editButton = event.target.closest('.edit-button');
             const deleteButton = event.target.closest('.delete-button');
@@ -448,20 +448,20 @@
             } else if (deleteButton) {
                 const docId = deleteButton.dataset.docId;
                 const droidRef = doc(db, `artifacts/${appId}/public/data/${droidCollectionName}`, docId);
-                try { await deleteDoc(droidRef); } catch (e) { console.error(e); }
+                try { await deleteDoc(droidRef); } catch (e) { console.error("Erro ao deletar o droid:", e); }
             }
         });
 
-        // Opens the modal for adding a new card
+        // Abre o modal para adicionar um novo cartão
         addCardBtn.addEventListener('click', () => openModal());
 
-        // Shows the modal, populating with existing data if a document ID is provided
+        // Mostra o modal, preenchendo com dados existentes se um ID de documento for fornecido
         function openModal(docId = null) {
             currentDroidDocId = docId;
             modal.style.display = 'flex';
             document.getElementById('modalTitle').textContent = docId ? 'Editar Droid' : 'Novo Droid';
 
-            // Reset all fields
+            // Reseta todos os campos
             document.getElementById('edit-name').value = '';
             setCheckboxes(editTypeGroup, []);
             setCheckboxes(editActivationGroup, []);
@@ -482,11 +482,13 @@
                         document.getElementById('edit-command-chain').value = data.commandChain || '';
                         newImageFile = data.image || null;
                     }
+                }).catch((error) => {
+                    console.error("Erro ao buscar o droid:", error);
                 });
             }
         }
 
-        // Closes the modal and resets the state
+        // Fecha o modal e reseta o estado
         function closeModal() {
             modal.style.display = 'none';
             currentDroidDocId = null;
@@ -497,14 +499,14 @@
         cancelBtn.addEventListener('click', closeModal);
         closeModalBtn.addEventListener('click', closeModal);
 
-        // Utility function to set the state of checkboxes
+        // Função utilitária para definir o estado das caixas de seleção
         function setCheckboxes(group, values) {
             group.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
                 checkbox.checked = values.includes(checkbox.value);
             });
         }
 
-        // Handles image file selection and conversion to Base64
+        // Lida com a seleção de arquivo de imagem e a conversão para Base64
         imageInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
@@ -514,7 +516,7 @@
             }
         });
 
-        // Saves or updates a droid card in Firestore
+        // Salva ou atualiza um cartão de droid no Firestore
         saveBtn.addEventListener('click', async () => {
             const name = document.getElementById('edit-name').value.trim();
             const type = Array.from(editTypeGroup.querySelectorAll('input[type="checkbox"]:checked')).map(i => i.value);
@@ -533,7 +535,7 @@
                     await addDoc(droidsRef, droidData);
                 }
                 closeModal();
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("Erro ao salvar o droid:", e); }
         });
     </script>
 </body>
