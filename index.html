@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cartas de Droids (Versão Corrigida)</title>
+    <title>Cartas de Droids</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -366,27 +366,28 @@
         // Listener para mudanças no estado de autenticação
         onAuthStateChanged(auth, async (user) => {
             if (user) {
+                // Usuário logado
                 userId = user.uid;
                 document.getElementById('userIdDisplay').textContent = `ID do Usuário: ${userId}`;
-                await setupFirestoreListener();
                 addCardBtn.disabled = false;
+                setupFirestoreListener();
             } else {
-                // Tenta fazer login com o token fornecido, caso contrário, faz login anonimamente
-                if (initialAuthToken) {
-                    try {
+                // Nenhum usuário logado, tenta o login
+                try {
+                    if (initialAuthToken) {
                         await signInWithCustomToken(auth, initialAuthToken);
-                    } catch (e) {
-                        console.error("Falha no login com token. Tentando login anônimo.", e);
+                    } else {
                         await signInAnonymously(auth);
                     }
-                } else {
-                    await signInAnonymously(auth);
+                } catch (e) {
+                    console.error("Erro ao fazer login:", e);
+                    document.getElementById('userIdDisplay').textContent = 'Erro de conexão. Tente novamente.';
                 }
             }
         });
 
         // Configura um ouvinte em tempo real para a coleção do Firestore
-        async function setupFirestoreListener() {
+        function setupFirestoreListener() {
             // Caminho correto para dados públicos colaborativos
             const droidsRef = collection(db, `artifacts/${appId}/public/data/${droidCollectionName}`);
             onSnapshot(droidsRef, (snapshot) => {
@@ -395,6 +396,8 @@
                     droidsData.push({ id: doc.id, ...doc.data() });
                 });
                 renderCards(droidsData);
+            }, (error) => {
+                console.error("Erro no listener de snapshot:", error);
             });
         }
 
