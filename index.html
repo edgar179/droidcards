@@ -1,555 +1,270 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cartas de Droids</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0d1117;
-            color: #c9d1d9;
-            min-height: 100vh;
-            padding: 2rem;
-        }
-        .header-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            max-width: 1200px;
-            width: 100%;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .user-id-display {
-            font-size: 0.875rem;
-            color: #8b949e;
-            background-color: #161b22;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            border: 1px solid #30363d;
-        }
-        .add-card-button {
-            background-color: #216e39;
-            color: #c9d1d9;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .add-card-button:hover {
-            background-color: #2e8b57;
-        }
-        .add-card-button:disabled {
-            background-color: #161b22;
-            cursor: not-allowed;
-            color: #8b949e;
-        }
-        .card-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-            max-width: 1200px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .droid-card {
-            background-color: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 1rem;
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-        }
-        .droid-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
-        }
-        .card-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-        .card-icon-container {
-            margin-right: 1rem;
-            width: 4rem;
-            height: 4rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #1f2a37;
-            border-radius: 50%;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-        .card-icon-container i {
-            font-size: 2.5rem;
-            color: #58a6ff;
-        }
-        .card-icon-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .card-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #58a6ff;
-        }
-        .card-subtitle {
-            font-size: 1rem;
-            font-weight: 500;
-            color: #8b949e;
-        }
-        .card-section {
-            margin-bottom: 1rem;
-        }
-        .card-label {
-            font-weight: 600;
-            color: #c9d1d9;
-        }
-        .card-text {
-            color: #8b949e;
-            font-size: 0.9rem;
-        }
-        .edit-button {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background-color: transparent;
-            border: none;
-            color: #8b949e;
-            cursor: pointer;
-            font-size: 1.25rem;
-            transition: color 0.2s;
-        }
-        .delete-button {
-            position: absolute;
-            top: 1rem;
-            right: 3.5rem;
-            background-color: transparent;
-            border: none;
-            color: #8b949e;
-            cursor: pointer;
-            font-size: 1.25rem;
-            transition: color 0.2s;
-        }
-        .edit-button:hover {
-            color: #58a6ff;
-        }
-        .delete-button:hover {
-            color: #ff7b72;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 100;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            max-width: 90%;
-            max-height: 90%;
-            width: 700px;
-            height: 600px;
-            background-color: #1f2a37;
-            padding: 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
-            border: 1px solid #30363d;
-            overflow-y: auto;
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-        .modal-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #c9d1d9;
-        }
-        .modal-input {
-            width: 100%;
-            padding: 0.75rem;
-            margin-bottom: 1rem;
-            border-radius: 0.5rem;
-            background-color: #0d1117;
-            border: 1px solid #30363d;
-            color: #c9d1d9;
-            resize: vertical;
-        }
-        .modal-buttons {
-            display: flex;
-            justify-content: flex-end;
-            gap: 1rem;
-        }
-        .modal-button {
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            transition: background-color 0.2s;
-        }
-        .modal-button:disabled {
-            background-color: #161b22;
-            cursor: not-allowed;
-            color: #8b949e;
-        }
-        .checkbox-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem 1rem;
-            margin-bottom: 1rem;
-        }
-        .checkbox-label {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-        }
-        .checkbox-label input[type="checkbox"] {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 1.25rem;
-            height: 1.25rem;
-            border: 2px solid #30363d;
-            border-radius: 0.25rem;
-            background-color: #0d1117;
-            transition: background-color 0.2s, border-color 0.2s;
-            position: relative;
-        }
-        .checkbox-label input[type="checkbox"]:checked {
-            background-color: #58a6ff;
-            border-color: #58a6ff;
-        }
-        .checkbox-label input[type="checkbox"]:checked::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0.5rem;
-            height: 0.75rem;
-            border: solid #0d1117;
-            border-width: 0 3px 3px 0;
-            transform: translate(-50%, -50%) rotate(45deg);
-        }
-        .modal-form-grid {
-            display: grid;
-            grid-template-columns: repeat(1, 1fr);
-            gap: 1.5rem;
-        }
-        @media (min-width: 768px) {
-            .modal-form-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        .grid-span-2 {
-            grid-column: span 2 / span 2;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cartas de Droids</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+body { font-family: 'Inter', sans-serif; background-color: #0d1117; color: #c9d1d9; min-height: 100vh; padding: 2rem; }
+.header-container { display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem; max-width:1200px; margin:0 auto; }
+.user-id-display { font-size:0.875rem; color:#8b949e; background-color:#161b22; padding:0.5rem 1rem; border-radius:0.5rem; border:1px solid #30363d; }
+.add-card-button { background-color:#216e39; color:#c9d1d9; padding:0.75rem 1.5rem; border-radius:0.5rem; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:0.5rem; transition:background-color 0.2s; }
+.add-card-button:hover { background-color:#2e8b57; }
+.card-container { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:2rem; max-width:1200px; margin:0 auto; }
+.droid-card { background-color:#161b22; border:1px solid #30363d; border-radius:1rem; padding:1.5rem; display:flex; flex-direction:column; position:relative; box-shadow:0 4px 15px rgba(0,0,0,0.4); transition:transform 0.3s ease, box-shadow 0.3s ease; }
+.droid-card:hover { transform:translateY(-5px); box-shadow:0 8px 20px rgba(0,0,0,0.6); }
+.card-header { display:flex; align-items:center; margin-bottom:1rem; }
+.card-icon-container { margin-right:1rem; width:4rem; height:4rem; display:flex; justify-content:center; align-items:center; background-color:#1f2a37; border-radius:50%; overflow:hidden; flex-shrink:0; }
+.card-icon-container i { font-size:2.5rem; color:#58a6ff; }
+.card-icon-container img { width:100%; height:100%; object-fit:cover; }
+.card-title { font-size:1.5rem; font-weight:700; color:#58a6ff; }
+.card-subtitle { font-size:1rem; font-weight:500; color:#8b949e; }
+.card-section { margin-bottom:1rem; }
+.card-label { font-weight:600; color:#c9d1d9; }
+.card-text { color:#8b949e; font-size:0.9rem; }
+.edit-button, .delete-button { position:absolute; top:1rem; background:transparent; border:none; cursor:pointer; font-size:1.25rem; color:#8b949e; transition:color 0.2s; }
+.delete-button { right:3.5rem; }
+.edit-button { right:1rem; }
+.edit-button:hover { color:#58a6ff; }
+.delete-button:hover { color:#ff7b72; }
+/* Modal */
+.modal { display:none; position:fixed; z-index:100; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.6); justify-content:center; align-items:center; }
+.modal-content { background-color:#1f2a37; padding:2rem; border-radius:1rem; width:700px; max-height:90%; box-shadow:0 4px 15px rgba(0,0,0,0.6); border:1px solid #30363d; overflow-y:auto; }
+.modal-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; }
+.modal-title { font-size:1.5rem; font-weight:700; color:#c9d1d9; }
+.modal-input { width:100%; padding:0.75rem; margin-bottom:1rem; border-radius:0.5rem; background-color:#0d1117; border:1px solid #30363d; color:#c9d1d9; resize:vertical; }
+.modal-buttons { display:flex; justify-content:flex-end; gap:1rem; }
+.modal-button { padding:0.75rem 1.5rem; border-radius:0.5rem; font-weight:600; transition:background-color 0.2s; }
+.modal-button:disabled { background-color:#161b22; cursor:not-allowed; color:#8b949e; }
+.checkbox-group { display:flex; flex-wrap:wrap; gap:0.5rem 1rem; margin-bottom:1rem; }
+.checkbox-label { display:flex; align-items:center; gap:0.5rem; cursor:pointer; }
+.checkbox-label input[type="checkbox"] { appearance:none; width:1.25rem; height:1.25rem; border:2px solid #30363d; border-radius:0.25rem; background-color:#0d1117; position:relative; }
+.checkbox-label input[type="checkbox"]:checked { background-color:#58a6ff; border-color:#58a6ff; }
+.checkbox-label input[type="checkbox"]:checked::after { content:''; position:absolute; top:50%; left:50%; width:0.5rem; height:0.75rem; border:solid #0d1117; border-width:0 3px 3px 0; transform:translate(-50%, -50%) rotate(45deg); }
+.modal-form-grid { display:grid; grid-template-columns:1fr; gap:1.5rem; }
+@media(min-width:768px){ .modal-form-grid { grid-template-columns:repeat(2,1fr); } }
+.grid-span-2 { grid-column:span 2 / span 2; }
+</style>
 </head>
 <body>
-    <div class="header-container">
-        <button id="addCardBtn" class="add-card-button" disabled><i class="fas fa-plus-circle"></i> Registrar novo Droid</button>
-        <div id="userIdDisplay" class="user-id-display"></div>
-    </div>
-    <div id="card-container" class="card-container"></div>
+<div class="header-container">
+<button id="addCardBtn" class="add-card-button"><i class="fas fa-plus-circle"></i> Registrar novo Droid</button>
+<div id="userIdDisplay" class="user-id-display"></div>
+</div>
+<div id="card-container" class="card-container"></div>
 
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle" class="modal-title"></h2>
-                <button id="closeModalBtn" class="edit-button"><i class="fas fa-times"></i></button>
-            </div>
-            
-            <div class="modal-form-grid">
-                <div>
-                    <label for="edit-name" class="block mb-2 text-sm font-medium text-gray-400">Nome:</label>
-                    <input type="text" id="edit-name" class="modal-input">
-                </div>
-                
-                <div>
-                    <label for="edit-type-group" class="block mb-2 text-sm font-medium text-gray-400">Função/Tipo:</label>
-                    <div id="edit-type-group" class="checkbox-group">
-                        <label class="checkbox-label"><input type="checkbox" value="Astromecânico"> Astromecânico</label>
-                        <label class="checkbox-label"><input type="checkbox" value="Apoio"> Apoio</label>
-                        <label class="checkbox-label"><input type="checkbox" value="Combate Pesado"> Combate Pesado</label>
-                        <label class="checkbox-label"><input type="checkbox" value="Combate Leve"> Combate Leve</label>
-                        <label class="checkbox-label"><input type="checkbox" value="Protocolo"> Protocolo</label>
-                    </div>
-                </div>
+<!-- Modal -->
+<div id="editModal" class="modal">
+<div class="modal-content">
+<div class="modal-header">
+<h2 id="modalTitle" class="modal-title"></h2>
+<button id="closeModalBtn" class="edit-button"><i class="fas fa-times"></i></button>
+</div>
+<div class="modal-form-grid">
+<div>
+<label>Nome:</label>
+<input type="text" id="edit-name" class="modal-input">
+</div>
+<div>
+<label>Função/Tipo:</label>
+<div id="edit-type-group" class="checkbox-group">
+<label class="checkbox-label"><input type="checkbox" value="Astromecânico"> Astromecânico</label>
+<label class="checkbox-label"><input type="checkbox" value="Apoio"> Apoio</label>
+<label class="checkbox-label"><input type="checkbox" value="Combate Pesado"> Combate Pesado</label>
+<label class="checkbox-label"><input type="checkbox" value="Combate Leve"> Combate Leve</label>
+<label class="checkbox-label"><input type="checkbox" value="Protocolo"> Protocolo</label>
+</div>
+</div>
+<div class="grid-span-2">
+<label>Ativação:</label>
+<div id="edit-activation-group" class="checkbox-group">
+<label class="checkbox-label"><input type="checkbox" value="DEFCON 4"> DEFCON 4</label>
+<label class="checkbox-label"><input type="checkbox" value="DEFCON 3"> DEFCON 3</label>
+<label class="checkbox-label"><input type="checkbox" value="DEFCON 2"> DEFCON 2</label>
+<label class="checkbox-label"><input type="checkbox" value="DEFCON 1"> DEFCON 1</label>
+<label class="checkbox-label"><input type="checkbox" value="Emergência Logística"> Emergência Logística</label>
+<label class="checkbox-label"><input type="checkbox" value="Emergência Médica"> Emergência Médica</label>
+<label class="checkbox-label"><input type="checkbox" value="Manual"> Manual</label>
+<label class="checkbox-label"><input type="checkbox" value="Missões"> Missões</label>
+<label class="checkbox-label"><input type="checkbox" value="Independente"> Independente</label>
+</div>
+</div>
+<div class="grid-span-2">
+<label>Diretrizes:</label>
+<textarea id="edit-directives" rows="3" class="modal-input"></textarea>
+</div>
+<div class="grid-span-2">
+<label>Cadeia de Comando:</label>
+<textarea id="edit-command-chain" rows="3" class="modal-input"></textarea>
+</div>
+<div class="grid-span-2">
+<label>Carregar Imagem (100x100px):</label>
+<input type="file" id="edit-image" accept="image/*" class="modal-input p-1">
+</div>
+</div>
+<div class="modal-buttons">
+<button id="saveBtn" class="modal-button bg-blue-600 text-white hover:bg-blue-700">Salvar</button>
+<button id="cancelBtn" class="modal-button bg-gray-500 text-white hover:bg-gray-600">Cancelar</button>
+</div>
+</div>
+</div>
 
-                <div class="grid-span-2">
-                    <label for="edit-activation-group" class="block mb-2 text-sm font-medium text-gray-400">Ativação:</label>
-                    <div id="edit-activation-group" class="checkbox-group">
-                        <label class="checkbox-label"><input type="checkbox" value="DEFCON 4"> DEFCON 4</label>
-                        <label class="checkbox-label"><input type="checkbox" value="DEFCON 3"> DEFCON 3</label>
-                        <label class="checkbox-label"><input type="checkbox" value="DEFCON 2"> DEFCON 2</label>
-                        <label class="checkbox-label"><input type="checkbox" value="DEFCON 1"> DEFCON 1</label>
-                        <label class="checkbox-label"><input type="checkbox" value="Emergência Logística"> Emergência Logística</label>
-                        <label class="checkbox-label"><input type="checkbox" value="Emergência Médica"> Emergência Médica</label>
-                        <label class="checkbox-label"><input type="checkbox" value="Manual"> Manual</label>
-                        <label class="checkbox-label"><input type="checkbox" value="Missões"> Missões</label>
-                        <label class="checkbox-label"><input type="checkbox" value="Independente"> Independente</label>
-                    </div>
-                </div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getFirestore, collection, doc, addDoc, updateDoc, deleteDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-                <div class="grid-span-2">
-                    <label for="edit-directives" class="block mb-2 text-sm font-medium text-gray-400">Diretrizes:</label>
-                    <textarea id="edit-directives" rows="3" class="modal-input"></textarea>
-                </div>
+const firebaseConfig = {
+  apiKey: "AIzaSyDgQP8wAX81LSM3I4fyj6GA5HWcPNiuBBs",
+  authDomain: "droidcards-5367f.firebaseapp.com",
+  projectId: "droidcards-5367f",
+  storageBucket: "droidcards-5367f.appspot.com",
+  messagingSenderId: "149545333964",
+  appId: "1:149545333964:web:74bd91c26fb82abc7f7e69"
+};
 
-                <div class="grid-span-2">
-                    <label for="edit-command-chain" class="block mb-2 text-sm font-medium text-gray-400">Cadeia de Comando:</label>
-                    <textarea id="edit-command-chain" rows="3" class="modal-input"></textarea>
-                </div>
-                
-                <div class="grid-span-2">
-                    <label for="edit-image" class="block mb-2 text-sm font-medium text-gray-400">Carregar Imagem (100x100px):</label>
-                    <input type="file" id="edit-image" accept="image/*" class="modal-input p-1">
-                </div>
-            </div>
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-            <div class="modal-buttons">
-                <button id="saveBtn" class="modal-button bg-blue-600 text-white hover:bg-blue-700">Salvar</button>
-                <button id="cancelBtn" class="modal-button bg-gray-500 text-white hover:bg-gray-600">Cancelar</button>
-            </div>
+let currentDroidDocId = null;
+let newImageFile = null;
+
+const container = document.getElementById('card-container');
+const modal = document.getElementById('editModal');
+const saveBtn = document.getElementById('saveBtn');
+const cancelBtn = document.getElementById('cancelBtn');
+const closeModalBtn = document.getElementById('closeModalBtn');
+const addCardBtn = document.getElementById('addCardBtn');
+const imageInput = document.getElementById('edit-image');
+const editTypeGroup = document.getElementById('edit-type-group');
+const editActivationGroup = document.getElementById('edit-activation-group');
+
+onAuthStateChanged(auth, async (user)=>{
+  if(!user){
+    await signInAnonymously(auth);
+  }
+  setupFirestoreListener();
+});
+
+function setupFirestoreListener(){
+  const droidsRef = collection(db, `artifacts/droidcards/public/data/droids`);
+  onSnapshot(droidsRef, (snapshot)=>{
+    const droids = [];
+    snapshot.forEach(doc=>droids.push({id:doc.id,...doc.data()}));
+    renderCards(droids);
+  });
+}
+
+function renderCards(droids){
+  container.innerHTML='';
+  if(droids.length===0){
+    container.innerHTML='<p class="text-center text-gray-500">Nenhum droid encontrado. Crie um novo!</p>';
+  }
+  droids.forEach(droid=>{
+    const card=document.createElement('div');
+    card.className='droid-card';
+    const icon=droid.image?`<img src="${droid.image}">`:`<i class="fas fa-robot"></i>`;
+    card.innerHTML=`
+      <button class="delete-button" data-id="${droid.id}"><i class="fas fa-trash-alt"></i></button>
+      <button class="edit-button" data-id="${droid.id}"><i class="fas fa-pencil-alt"></i></button>
+      <div class="card-header">
+        <div class="card-icon-container">${icon}</div>
+        <div>
+          <div class="card-title">${droid.name}</div>
+          <div class="card-subtitle">${droid.type?.join(', ')||''}</div>
         </div>
-    </div>
+      </div>
+      <div class="card-section"><div class="card-label">Ativação</div><div class="card-text">${droid.activation?.join(', ')||''}</div></div>
+      <div class="card-section"><div class="card-label">Diretrizes</div><div class="card-text">${droid.directives||''}</div></div>
+      <div class="card-section"><div class="card-label">Cadeia de Comando</div><div class="card-text">${droid.commandChain||''}</div></div>
+    `;
+    container.appendChild(card);
+  });
+}
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, addDoc, updateDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+// Abrir modal
+addCardBtn.onclick = ()=>openModal();
+container.addEventListener('click', async (e)=>{
+  const editBtn = e.target.closest('.edit-button');
+  const delBtn = e.target.closest('.delete-button');
+  if(editBtn){
+    const id = editBtn.dataset.id;
+    const docSnap = await getDoc(doc(db, `artifacts/droidcards/public/data/droids`, id));
+    openModal(id, docSnap.exists()?docSnap.data():{});
+  }
+  if(delBtn){
+    const id = delBtn.dataset.id;
+    await deleteDoc(doc(db, `artifacts/droidcards/public/data/droids`, id));
+  }
+});
 
-        // Global variables provided by the Canvas environment.
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+function openModal(docId=null, data={}){
+  currentDroidDocId=docId;
+  modal.style.display='flex';
+  document.getElementById('modalTitle').textContent=docId?'Editar Droid':'Criar Droid';
+  document.getElementById('edit-name').value=data.name||'';
+  document.getElementById('edit-directives').value=data.directives||'';
+  document.getElementById('edit-command-chain').value=data.commandChain||'';
+  imageInput.value='';
+  newImageFile=null;
 
-        let app;
-        let db;
-        let auth;
+  editTypeGroup.querySelectorAll('input').forEach(cb=>cb.checked=false);
+  editActivationGroup.querySelectorAll('input').forEach(cb=>cb.checked=false);
 
-        // Initialize Firebase app and services
-        try {
-            app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
-            console.log("Firebase initialized successfully.");
-        } catch (e) {
-            console.error("Failed to initialize Firebase:", e);
-        }
+  if(data.type) data.type.forEach(t=>{
+    const cb=editTypeGroup.querySelector(`input[value="${t}"]`);
+    if(cb) cb.checked=true;
+  });
+  if(data.activation) data.activation.forEach(a=>{
+    const cb=editActivationGroup.querySelector(`input[value="${a}"]`);
+    if(cb) cb.checked=true;
+  });
+}
 
-        let currentDroidDocId = null;
-        let userId = null;
-        const droidCollectionName = "droids";
-        const container = document.getElementById('card-container');
-        const modal = document.getElementById('editModal');
-        const saveBtn = document.getElementById('saveBtn');
-        const cancelBtn = document.getElementById('cancelBtn');
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        const addCardBtn = document.getElementById('addCardBtn');
-        const imageInput = document.getElementById('edit-image');
-        const editTypeGroup = document.getElementById('edit-type-group');
-        const editActivationGroup = document.getElementById('edit-activation-group');
+closeModalBtn.onclick = cancelBtn.onclick = ()=>{ modal.style.display='none'; }
 
-        let newImageFile = null;
+imageInput.onchange = (e)=>{ if(e.target.files[0]) newImageFile=e.target.files[0]; }
 
-        // Listener para mudanças no estado de autenticação
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                userId = user.uid;
-                document.getElementById('userIdDisplay').textContent = `ID do Usuário: ${userId}`;
-                addCardBtn.disabled = false;
-                setupFirestoreListener();
-            } else {
-                try {
-                    // Sign in with the provided custom token or anonymously if not available
-                    const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-                    if (initialAuthToken) {
-                        await signInWithCustomToken(auth, initialAuthToken);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-                } catch (e) {
-                    console.error("Erro ao fazer login anônimo:", e);
-                    document.getElementById('userIdDisplay').textContent = 'Erro de conexão. Tente novamente.';
-                }
-            }
-        });
+saveBtn.onclick = async ()=>{
+  const name=document.getElementById('edit-name').value;
+  const directives=document.getElementById('edit-directives').value;
+  const commandChain=document.getElementById('edit-command-chain').value;
+  const type=Array.from(editTypeGroup.querySelectorAll('input:checked')).map(c=>c.value);
+  const activation=Array.from(editActivationGroup.querySelectorAll('input:checked')).map(c=>c.value);
 
-        // Configura um ouvinte em tempo real para a coleção do Firestore
-        function setupFirestoreListener() {
-            const droidsRef = collection(db, `artifacts/${appId}/public/data/${droidCollectionName}`);
-            onSnapshot(droidsRef, (snapshot) => {
-                const droidsData = [];
-                snapshot.forEach(doc => {
-                    droidsData.push({ id: doc.id, ...doc.data() });
-                });
-                renderCards(droidsData);
-            }, (error) => {
-                console.error("Erro no listener de snapshot:", error);
-            });
-        }
+  let imageData=null;
+  if(newImageFile){
+    const reader=new FileReader();
+    reader.onload=async e=>{
+      imageData=e.target.result;
+      await saveDroid({name,type,activation,directives,commandChain,image:imageData});
+    };
+    reader.readAsDataURL(newImageFile);
+  } else {
+    let currentImage=null;
+    if(currentDroidDocId){
+      const dSnap=await getDoc(doc(db, `artifacts/droidcards/public/data/droids`, currentDroidDocId));
+      currentImage=dSnap.exists()?dSnap.data().image:null;
+    }
+    await saveDroid({name,type,activation,directives,commandChain,image:currentImage});
+  }
+}
 
-        // Renderiza os cartões de droid na página
-        function renderCards(droidsData) {
-            container.innerHTML = '';
-            if (droidsData.length === 0) {
-                container.innerHTML = '<p class="text-center text-gray-500">Nenhum droid encontrado. Crie um novo!</p>';
-            }
-            droidsData.forEach((droid) => {
-                const card = document.createElement('div');
-                card.className = 'droid-card';
-                // Usa um ícone de placeholder se não houver imagem
-                const iconContent = droid.image ? `<img src="${droid.image}" alt="Imagem do Droid">` : `<i class="fas fa-robot"></i>`;
-
-                card.innerHTML = `
-                    <button class="delete-button" data-doc-id="${droid.id}"><i class="fas fa-trash-alt"></i></button>
-                    <button class="edit-button" data-doc-id="${droid.id}"><i class="fas fa-pencil-alt"></i></button>
-                    <div class="card-header">
-                        <div class="card-icon-container">${iconContent}</div>
-                        <div>
-                            <div class="card-title">${droid.name}</div>
-                            <div class="card-subtitle">${droid.type.join(', ')}</div>
-                        </div>
-                    </div>
-                    <div class="card-section">
-                        <div class="card-label">Ativação</div>
-                        <div class="card-text">${droid.activation.join(', ')}</div>
-                    </div>
-                    <div class="card-section">
-                        <div class="card-label">Diretrizes</div>
-                        <div class="card-text">${droid.directives}</div>
-                    </div>
-                    <div class="card-section">
-                        <div class="card-label">Cadeia de Comando</div>
-                        <div class="card-text">${droid.commandChain}</div>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        // Lida com eventos de clique nos cartões para edição e exclusão
-        container.addEventListener('click', async (event) => {
-            const editButton = event.target.closest('.edit-button');
-            const deleteButton = event.target.closest('.delete-button');
-
-            if (editButton) {
-                const docId = editButton.dataset.docId;
-                openModal(docId);
-            } else if (deleteButton) {
-                const docId = deleteButton.dataset.docId;
-                const droidRef = doc(db, `artifacts/${appId}/public/data/${droidCollectionName}`, docId);
-                try { await deleteDoc(droidRef); } catch (e) { console.error("Erro ao deletar o droid:", e); }
-            }
-        });
-
-        // Abre o modal para adicionar um novo cartão
-        addCardBtn.addEventListener('click', () => openModal());
-
-        // Mostra o modal, preenchendo com dados existentes se um ID de documento for fornecido
-        function openModal(docId = null) {
-            currentDroidDocId = docId;
-            modal.style.display = 'flex';
-            document.getElementById('modalTitle').textContent = docId ? 'Editar Droid' : 'Novo Droid';
-
-            // Reseta todos os campos
-            document.getElementById('edit-name').value = '';
-            setCheckboxes(editTypeGroup, []);
-            setCheckboxes(editActivationGroup, []);
-            document.getElementById('edit-directives').value = '';
-            document.getElementById('edit-command-chain').value = '';
-            newImageFile = null;
-            imageInput.value = '';
-            
-            if (docId) {
-                const droidRef = doc(db, `artifacts/${appId}/public/data/${droidCollectionName}`, docId);
-                getDoc(droidRef).then(snapshot => {
-                    if (snapshot.exists()) {
-                        const data = snapshot.data();
-                        document.getElementById('edit-name').value = data.name || '';
-                        setCheckboxes(editTypeGroup, data.type || []);
-                        setCheckboxes(editActivationGroup, data.activation || []);
-                        document.getElementById('edit-directives').value = data.directives || '';
-                        document.getElementById('edit-command-chain').value = data.commandChain || '';
-                        newImageFile = data.image || null;
-                    }
-                }).catch((error) => {
-                    console.error("Erro ao buscar o droid:", error);
-                });
-            }
-        }
-
-        // Fecha o modal e reseta o estado
-        function closeModal() {
-            modal.style.display = 'none';
-            currentDroidDocId = null;
-            newImageFile = null;
-            imageInput.value = '';
-        }
-
-        cancelBtn.addEventListener('click', closeModal);
-        closeModalBtn.addEventListener('click', closeModal);
-
-        // Função utilitária para definir o estado das caixas de seleção
-        function setCheckboxes(group, values) {
-            group.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-                checkbox.checked = values.includes(checkbox.value);
-            });
-        }
-
-        // Lida com a seleção de arquivo de imagem e a conversão para Base64
-        imageInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = () => { newImageFile = reader.result; };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // Salva ou atualiza um cartão de droid no Firestore
-        saveBtn.addEventListener('click', async () => {
-            const name = document.getElementById('edit-name').value.trim();
-            const type = Array.from(editTypeGroup.querySelectorAll('input[type="checkbox"]:checked')).map(i => i.value);
-            const activation = Array.from(editActivationGroup.querySelectorAll('input[type="checkbox"]:checked')).map(i => i.value);
-            const directives = document.getElementById('edit-directives').value.trim();
-            const commandChain = document.getElementById('edit-command-chain').value.trim();
-
-            const droidData = { name, type, activation, directives, commandChain, image: newImageFile };
-
-            try {
-                const droidsRef = collection(db, `artifacts/${appId}/public/data/${droidCollectionName}`);
-                if (currentDroidDocId) {
-                    const droidRef = doc(droidsRef, currentDroidDocId);
-                    await updateDoc(droidRef, droidData);
-                } else {
-                    await addDoc(droidsRef, droidData);
-                }
-                closeModal();
-            } catch (e) { console.error("Erro ao salvar o droid:", e); }
-        });
-    </script>
+async function saveDroid(data){
+  if(currentDroidDocId){
+    await updateDoc(doc(db, `artifacts/droidcards/public/data/droids`, currentDroidDocId), data);
+  } else {
+    await addDoc(collection(db, `artifacts/droidcards/public/data/droids`), data);
+  }
+  modal.style.display='none';
+}
+</script>
 </body>
 </html>
+
 
 
